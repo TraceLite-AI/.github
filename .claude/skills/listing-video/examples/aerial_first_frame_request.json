@@ -1,0 +1,9 @@
+{
+ "model": "sd_2.0_discount",
+ "prompt": "以这张图作为视频的首帧。航拍，无人机从当前位置缓慢向后上方拉远并轻微向右环绕，逐渐露出整个后院和房子的全貌。泳池、躺椅、房子的形状和位置保持和首帧完全一致，不要变形，不要出现画面中没有的东西，画面中没有人。池水微微波动，树叶被微风轻轻吹动，傍晚暖色阳光，光的方向不变。无背景音乐，无字幕。",
+ "first_image": "https://example.com/backyard.jpg",
+ "duration": 4,
+ "aspect_ratio": "16:9",
+ "resolution": "720p",
+ "generate_audio": false
+}
