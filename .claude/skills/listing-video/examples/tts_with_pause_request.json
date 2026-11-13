@@ -1,0 +1,10 @@
+{
+ "model": "minimax-tts",
+ "text": "<#3.0#>Welcome to twelve eighty-four Willow Creek Lane. This modern farmhouse is listed at eight hundred sixty-five thousand dollars.",
+ "voice_setting": {
+  "voice_id": "English_Graceful_Lady",
+  "speed": 1.1
+ },
+ "language_boost": "English",
+ "upstream_model": "speech-2.8-hd"
+}
