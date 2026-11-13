@@ -178,7 +178,7 @@ API 请求体见 `examples/relight_request.json`（模型 `seedream-5.0`，`refe
 - 模式：全能参考（图 + 音频一起参考），开启"生成音频"
 - 时长：一个节点 4–15 秒
 - 比例：16:9 为主；发短视频平台另做一版 9:16
-- 清晰度：720P 打样，定稿再考虑高清
+- **视频模型固定：Seedance 2.0 折扣版（`sd_2.0_discount`），清晰度固定 720p。** 打样和定稿都用这一个配置，不换别的视频模型，不升清晰度。脚本里已经写死，不提供修改选项。
 
 ## 四点五、用 API 全自动跑一遍（已实测跑通）
 
@@ -197,7 +197,7 @@ API 请求体见 `examples/relight_request.json`（模型 `seedream-5.0`，`refe
 | 优化帧（图生图改光影） | `seedream-5.0` | 加 `reference_images: [原始照片链接]` | 约 0.32 / 张 |
 | 声音克隆（未实测） | `minimax_voice_clone` | `file_url`、`text`、`upstream_model` | 未测 |
 | 配音 | `minimax-tts` | `voice_setting.voice_id`、`upstream_model: speech-2.8-hd` | 约 0.01 / 段 |
-| 视频 | `sd_2.0_discount` | `reference_images`（最多 9）、`reference_audios`（最多 3）、`duration` 4–15、`resolution` | 约 0.07 / 秒（720p） |
+| 视频 | `sd_2.0_discount` | `reference_images`（最多 9）、`reference_audios`（最多 3）、`duration` 4–15、`resolution: 720p`（固定） | 约 0.07 / 秒（720p） |
 
 - 参考素材必须是**公开可访问的链接**。前一步生成的图片、音频链接可以直接喂给视频任务。
 - 结果链接约 24 小时过期，生成完马上下载。
@@ -416,7 +416,7 @@ scripts/grab_frame.sh media/seg1.mp4 last media/tail.png    # 截最后一帧，
 API 里首帧、尾帧是单独的参数（请求体示例见 `examples/aerial_first_frame_request.json`）：
 
 ```json
-{ "model": "sd_2.0_discount", "prompt": "以这张图作为视频的首帧。航拍……",
+{ "model": "sd_2.0_discount", "resolution": "720p", "prompt": "以这张图作为视频的首帧。航拍……",
   "first_image": "https://…/backyard.jpg", "duration": 4, "generate_audio": false }
 ```
 

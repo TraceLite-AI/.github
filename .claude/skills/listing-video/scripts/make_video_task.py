@@ -8,11 +8,14 @@
   提示词从 job/<段名>.prompt.txt 读取，请求体写到 job/<段名>.json。
   提示词里按顺序用"图片1、图片2…""音频1…"指代参考素材。
 
-选项: --model sd_2.0_discount  --ratio 16:9  --res 720p
+视频模型和清晰度是固定的：Seedance 2.0 折扣版（sd_2.0_discount）、720p，不提供修改选项。
+选项: --ratio 16:9（竖版用 9:16）
 """
 import json, os, sys
 
 JOB = os.environ.get('GS_JOB_DIR', 'job')
+VIDEO_MODEL = 'sd_2.0_discount'   # 固定：Seedance 2.0 折扣版
+VIDEO_RESOLUTION = '720p'         # 固定
 
 
 def resolve(src):
@@ -28,15 +31,17 @@ def main():
     opts = dict(zip(sys.argv[1:], sys.argv[2:]))
     if len(args) < 3:
         sys.exit(__doc__)
+    if '--model' in opts or '--res' in opts:
+        sys.exit('视频模型和清晰度已固定为 sd_2.0_discount / 720p，不能修改。')
     name, dur, imgs = args[0], int(args[1]), args[2].split(',')
     auds = args[3].split(',') if len(args) > 3 and args[3] else []
     body = {
-        'model': opts.get('--model', 'sd_2.0_discount'),
+        'model': VIDEO_MODEL,
         'prompt': open(os.path.join(JOB, name + '.prompt.txt'), encoding='utf-8').read().strip(),
         'reference_images': [resolve(i) for i in imgs],
         'duration': dur,                       # 4–15 秒
         'aspect_ratio': opts.get('--ratio', '16:9'),
-        'resolution': opts.get('--res', '720p'),
+        'resolution': VIDEO_RESOLUTION,
         'generate_audio': True,
     }
     if auds:
