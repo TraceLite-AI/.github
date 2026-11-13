@@ -52,6 +52,80 @@ description: 把房源照片做成带经纪人出镜的 AI 房源视频（listin
 - 比例：16:9 为主；发短视频平台另做一版 9:16
 - 清晰度：720P 打样，定稿再考虑高清
 
+## 四点五、用 API 全自动跑一遍（已实测跑通）
+
+不用画布也能做。下面是用 GlobalStore API 实际跑通一条 39 秒样片的做法，脚本在本目录 `scripts/`，当时用的提示词在 `examples/`。
+
+### 接口要点
+
+- 文档：`https://docs.globalstore.ai/zh`。图片、配音、视频都走同一个接口：
+  提交 `POST /kyyReactApiServer/v2/model-center/tasks`，查询 `GET .../tasks/{id}`，余额 `GET /kyyReactApiServer/users/getBalance`。
+- 认证：请求头 `Authorization: Bearer <key>`。**密钥只放环境变量 `GLOBALSTORE_API_KEY`，不写进文件、不提交 git。** 用户把密钥明文发在聊天里时，提醒对方用完后去控制台换新的。
+- 用到的模型：
+
+| 用途 | model | 关键参数 | 实测单价 |
+|---|---|---|---|
+| 房间照片、定妆图 | `seedream-5.0` | `aspect_ratio`、`resolution: 2K` | 约 0.32 / 张 |
+| 配音 | `minimax-tts` | `voice_setting.voice_id`、`upstream_model: speech-2.8-hd` | 约 0.01 / 段 |
+| 视频 | `sd_2.0_discount` | `reference_images`（最多 9）、`reference_audios`（最多 3）、`duration` 4–15、`resolution` | 约 0.07 / 秒（720p） |
+
+- 参考素材必须是**公开可访问的链接**。前一步生成的图片、音频链接可以直接喂给视频任务。
+- 结果链接约 24 小时过期，生成完马上下载。
+- 提交时返回的 `amount` 是预扣，比实际高好几倍；实际扣费看任务完成后的 `amount`。
+- 单价文档里要登录才看得到，所以**先跑最短的一段测出实际扣费，再批量跑**，每一步后查一次余额。
+- 提示词里用"图片1、图片2、音频1"按传入顺序指代素材。
+
+### 操作步骤
+
+```bash
+export GLOBALSTORE_API_KEY=...      # 只在当前终端里
+SK=.claude/skills/listing-video/scripts
+mkdir -p job media
+
+# 1. 生成素材（真实项目跳过这步，直接用房源照片和经纪人素材的公开链接）
+python3 $SK/gs.py submit img_living job/img_living.json     # 请求体写法见 examples/asset_requests.json
+python3 $SK/gs.py submit vo1 job/vo1.json
+python3 $SK/gs.py wait img_living vo1
+
+# 2. 量一下每段配音多长，决定每段视频的时长
+python3 $SK/gs.py fetch vo1 media/vo1.mp3 && ffprobe -v error -show_entries format=duration -of csv=p=0 media/vo1.mp3
+
+# 3. 写提示词到 job/seg1.prompt.txt，拼请求体，提交
+python3 $SK/make_video_task.py seg1 13 img_exterior,img_agent vo1
+python3 $SK/gs.py submit seg1 job/seg1.json && python3 $SK/gs.py wait seg1
+
+# 4. 下载、看图检查
+python3 $SK/gs.py fetch seg1 media/seg1.mp4 && $SK/review.sh media/seg1.mp4
+
+# 5. 拼成片
+$SK/stitch.sh listing_video.mp4 media/seg1.mp4 media/seg2.mp4 media/seg3.mp4 media/seg4.mp4
+```
+
+### 时长怎么定
+
+- 空镜段：视频时长 = 配音时长向上取整，再加 0–1 秒。
+- 出镜段带航拍：视频时长 = 配音时长 + 航拍的 3 秒。
+- 实测一条 4 段样片：配音 9.9 / 8.1 / 6.1 / 6.3 秒，对应视频 13 / 9 / 7 / 10 秒，合计 39 秒。
+
+### 没有真实素材时怎么做样片
+
+先做一条全虚构的样片给用户看效果，再换真素材。
+
+- 房间照片：6 张同一套风格的图，提示词共用一段"房型 + 光线 + 镜头"的前缀，只换房间描述，保证像同一栋房子。必写 `no people, no text, no watermark`。
+- 定妆图：一张 1:1 的四视图，写明"同一个人、2x2 排列、正面/侧面/背面全身 + 头肩特写、浅灰影棚背景"。
+- 配音：把旁白切好段，每段单独合成一条，全片用同一个 `voice_id`。数字写成英文单词（"twelve eighty-four"），避免读错。
+- 明确告诉用户：样片里的房子、人、地址、价格都是虚构的。
+
+### 成本参考
+
+一条约 40 秒的 4 段样片，含 7 张图、4 段配音、4 段视频各跑 1 次，实际花费约 5 额度。每重跑一段约 0.5–0.9。
+
+### 交付
+
+- 成片先在本地用 `stitch.sh` 拼好。
+- 用户说打不开文件时，把视频压到 15MB 以内，连同一个简单的播放页一起发布成网页链接；发不了邮件就直说。
+- 交付时必须说明：**画面是逐帧抽查过的，声音没法听**，台词和口型要用户自己确认。
+
 ## 五、B 类：空镜片段怎么写
 
 **规则：一张照片拆 2–3 个镜头，先全景后局部，每个镜头 2–3 秒。每个镜头只写四样：哪张图、景别、运镜、画面里什么在动。**
@@ -174,12 +248,31 @@ description: 把房源照片做成带经纪人出镜的 AI 房源视频（listin
 3. **嘴不动** → 加"张嘴说到"；确认这段配音连上了，并剪到和片段差不多长。
 4. **站位不对** → 做标记图；或从上次生成里截一帧好的当构图参考。
 5. **一段里问题多** → 把 15 秒拆成两个短节点（人 4–6 秒一个，空镜一个）分别生成。
+6. **人有贴片感** → 按第六节"去掉贴片感"改提示词重跑。实测开场段改善明显；人站在水边、背景很亮的镜头改善有限，需要多跑几次挑。
+7. **航拍把房子或泳池的形状改了** → 只在提示词里写"泳池是长方形"压不住（实测无效）。把航拍单独拆成一个节点，只连那一张照片，不要和人物段混在一起；还不行就换成贴地的缓慢环绕，不用航拍。
+8. **人入画时间比写的早或晚** → 模型对秒数只是大致遵守，前后差 1 秒属正常，靠剪辑修，不值得重跑。
+9. **改了提示词后镜头角度变了，背景里看不到房子** → 在镜头描述里写明"身后是泳池和房子"，把要入镜的东西点名。
+
+### 检查成片的方法
+
+- 每段用 `scripts/review.sh` 出一张"每秒一帧"的总览图，看人物是否一致、场景是否走样、分镜是否到位。
+- 觉得可疑的地方再单独截一帧大图看（光的方向、脸的亮度、脚下有没有影子）。
+- 用 `ffmpeg -af silencedetect` 可以确认有没有人声停顿，但听不出念得对不对。
 
 ## 十、注意事项
 
 - 经纪人的长相和声音只能在本人授权下使用。
 - 视频里的房子要和真实房源一致，不要让模型添加不存在的设施或景观，避免误导买家。
 - 字幕、音乐、联系方式放到后期剪辑里加，生成时一律写"无背景音乐，无字幕"。
+
+## 目录里的文件
+
+- `scripts/gs.py`：提交任务、等待结果、查余额、下载结果。
+- `scripts/make_video_task.py`：把提示词、参考图、参考音频拼成视频任务请求体。
+- `scripts/review.sh`：给一段视频出每秒一帧的总览图。
+- `scripts/stitch.sh`：按顺序拼接多段视频，统一尺寸和响度。
+- `examples/*.prompt.txt`：实测跑通的 4 段提示词（开场出镜、客厅厨房空镜、主卧浴室空镜、结尾出镜），可直接改写套用。
+- `examples/asset_requests.json`：生成虚构房间照片、定妆图、配音的请求体示例。
 
 ## 十一、交付给用户时的输出格式
 

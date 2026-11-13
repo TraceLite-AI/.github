@@ -1,0 +1,54 @@
+{
+ "img_exterior": {
+  "model": "seedream-5.0",
+  "prompt": "Professional real estate listing photograph, front exterior of a modern farmhouse style single-family home in Austin Texas, white board-and-batten siding, black window frames, dark metal roof, covered front porch with wooden posts, stone pathway leading to a natural wood front door, manicured green lawn, two live oak trees, late afternoon golden hour sunlight from the left, clear sky, wide angle 24mm, eye level, ultra sharp, photorealistic, no people, no text, no watermark",
+  "aspect_ratio": "16:9",
+  "resolution": "2K"
+ },
+ "img_living": {
+  "model": "seedream-5.0",
+  "prompt": "Professional real estate listing photograph, modern farmhouse home in Austin Texas, bright open-concept living room, white walls, wide-plank light oak floor, exposed wood ceiling beams, cream linen sofa, stone fireplace, large black-framed windows with sheer white curtains, potted fiddle leaf fig, ceiling fan, late afternoon warm natural sunlight, wide angle 24mm, eye level, ultra sharp, photorealistic, no people, no text, no watermark",
+  "aspect_ratio": "16:9",
+  "resolution": "2K"
+ },
+ "img_kitchen": {
+  "model": "seedream-5.0",
+  "prompt": "Professional real estate listing photograph, modern farmhouse home in Austin Texas, chef's kitchen, large white quartz waterfall island with three wooden bar stools, white shaker cabinets, matte black pendant lights, stainless steel range, farmhouse sink under a window, light oak floor, small potted herbs on the counter, late afternoon warm natural sunlight, wide angle 24mm, eye level, ultra sharp, photorealistic, no people, no text, no watermark",
+  "aspect_ratio": "16:9",
+  "resolution": "2K"
+ },
+ "img_bedroom": {
+  "model": "seedream-5.0",
+  "prompt": "Professional real estate listing photograph, modern farmhouse home in Austin Texas, serene primary bedroom, king bed with white linen bedding and oatmeal throw, vaulted ceiling with wood beams, ceiling fan, sheer white curtains on tall windows, oak nightstands with ceramic lamps, potted olive tree, neutral rug, late afternoon warm natural sunlight, wide angle 24mm, eye level, ultra sharp, photorealistic, no people, no text, no watermark",
+  "aspect_ratio": "16:9",
+  "resolution": "2K"
+ },
+ "img_bathroom": {
+  "model": "seedream-5.0",
+  "prompt": "Professional real estate listing photograph, modern farmhouse home in Austin Texas, spa-inspired primary bathroom, freestanding white soaking tub beneath a window, double oak vanity with white quartz top and brass faucets, walk-in glass shower, white candles and eucalyptus on the tub tray, large format stone tile floor, late afternoon warm natural sunlight, wide angle 24mm, eye level, ultra sharp, photorealistic, no people, no text, no watermark",
+  "aspect_ratio": "16:9",
+  "resolution": "2K"
+ },
+ "img_backyard": {
+  "model": "seedream-5.0",
+  "prompt": "Professional real estate listing photograph, modern farmhouse home in Austin Texas, backyard with rectangular swimming pool with clear turquoise water, limestone deck, two white lounge chairs, covered patio with outdoor dining table, the white board-and-batten house with black window frames in the background, green lawn, live oak tree, late afternoon warm natural sunlight, wide angle 24mm, eye level, ultra sharp, photorealistic, no people, no text, no watermark",
+  "aspect_ratio": "16:9",
+  "resolution": "2K"
+ },
+ "img_agent": {
+  "model": "seedream-5.0",
+  "prompt": "Character reference sheet of one fictional female real estate agent in her late thirties, shoulder-length chestnut brown hair, warm friendly smile, wearing a navy blue blazer over a white blouse, beige tailored trousers, tan loafers. Four views of the same woman on a plain light grey studio background arranged in a 2x2 grid: front full body, side profile full body, back full body, and a close-up head-and-shoulders portrait. Consistent face, hair and outfit in all four views, soft even studio lighting, photorealistic, sharp detail, no text, no watermark",
+  "aspect_ratio": "1:1",
+  "resolution": "2K"
+ },
+ "vo1": {
+  "model": "minimax-tts",
+  "text": "Welcome to twelve eighty-four Willow Creek Lane. This modern farmhouse is listed at eight hundred sixty-five thousand dollars.",
+  "voice_setting": {
+   "voice_id": "English_Graceful_Lady",
+   "speed": 1
+  },
+  "language_boost": "English",
+  "upstream_model": "speech-2.8-hd"
+ }
+}
